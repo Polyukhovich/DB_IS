@@ -1,0 +1,64 @@
+
+-- 1. Які товари продавалися найбільше за останній місяць?
+SELECT Product.Name, SUM(OrderDetails.Quantity) AS TotalSales
+FROM OrderDetails
+JOIN Product ON Product.ProductID = OrderDetails.ProductID
+JOIN Orders ON Orders.OrderID = OrderDetails.OrderID
+WHERE Orders.OrderDate >= CURRENT_DATE - INTERVAL '1 month'
+GROUP BY Product.Name
+ORDER BY TotalSales DESC;
+
+-- 2. Яка середня кількість продажів кожного товару в магазині?
+SELECT Product.Name, AVG(OrderDetails.Quantity) AS AvgSales
+FROM OrderDetails
+JOIN Product ON Product.ProductID = OrderDetails.ProductID
+GROUP BY Product.Name;
+
+-- 3. Які клієнти здійснили найбільше покупок?
+SELECT Customer.Name, COUNT(Orders.OrderID) AS TotalOrders
+FROM Orders
+JOIN Customer ON Customer.CustomerID = Orders.CustomerID
+GROUP BY Customer.Name
+ORDER BY TotalOrders DESC;
+
+-- 4. Які продажі були здійснені через онлайн-канал?
+SELECT Orders.OrderID, Orders.TotalAmount
+FROM Orders
+WHERE Orders.SalesChannel = 'Online';  -- Передбачається, що є колонка SalesChannel
+
+-- 5. Яка загальна сума всіх продажів за певний період?
+SELECT SUM(TotalAmount) AS TotalSales
+FROM Orders
+WHERE OrderDate >= '2024-01-01' AND OrderDate <= '2024-01-31';
+
+-- 6. Які товари мають найбільший знижений відсоток?
+SELECT Product.Name, (Product.OriginalPrice - Product.Price) / Product.OriginalPrice * 100 AS DiscountPercentage
+FROM Product
+ORDER BY DiscountPercentage DESC
+LIMIT 10;
+
+-- 7. Яка кількість покупок була здійснена на вихідних днях?
+SELECT COUNT(*) AS WeekendSales
+FROM Orders
+WHERE EXTRACT(DOW FROM Orders.OrderDate) IN (6, 7);  -- 6 - субота, 7 - неділя
+
+-- 8. Які категорії товарів мали найбільший попит?
+SELECT Product.Category, SUM(OrderDetails.Quantity) AS TotalSales
+FROM OrderDetails
+JOIN Product ON Product.ProductID = OrderDetails.ProductID
+GROUP BY Product.Category
+ORDER BY TotalSales DESC;
+
+-- 9. Яка кількість продажів була здійснена в межах певного регіону?
+SELECT Customer.Region, SUM(OrderDetails.Quantity) AS SalesByRegion
+FROM OrderDetails
+JOIN Orders ON Orders.OrderID = OrderDetails.OrderID
+JOIN Customer ON Customer.CustomerID = Orders.CustomerID
+GROUP BY Customer.Region;
+
+-- 10. Які товари повернуті найчастіше?
+SELECT Product.Name, COUNT(Returns.ReturnID) AS ReturnCount
+FROM Returns
+JOIN Product ON Product.ProductID = Returns.ProductID
+GROUP BY Product.Name
+ORDER BY ReturnCount DESC;
